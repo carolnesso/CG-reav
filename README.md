@@ -1,5 +1,9 @@
 # Reavaliação da AB1 de COMPUTAÇÃO GRÁFICA
 
+## Para rodar o programa:
+Para rodar o programa utilizando o Windows basta baixar o freeglut 
+```gcc main.c -o teste.exe -I"C:/User/Documents/CG-reav-AB1/include/GL" -L"C:/Users/Documents/CG-reav-AB1/lib/x64" -lfreeglut -lopengl32 ou gcc main.c -o teste.exe -I"C:/freeglut/include/GL" -L"C:/freeglut/lib/x64" -lfreeglut -lopengl32```
+
 ### Para a reavaliação da AB1, serão cobrados o seguintes requisitos:
  - [] Modelagem da cozinha
  - [] 10 objetos na cozinha, no mínimo.
