@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "stb_image.cpp"
+#include "import.c"
+
 
 void display()
 {
@@ -12,6 +13,22 @@ void display()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    // View matrix
+    Vec3 fwd = forward(&CAM);
+    Vec3 u = up(&CAM);
+    Vec3 eye = CAM.position;
+    Vec3 center = {eye.x + fwd.x, eye.y + fwd.y, eye.z + fwd.z};
+
+    gluLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, u.x, u.y, u.z);
+    setup_lighting();
+
+    draw_grid(25);
+
+    int i;
+    // Draw the air conditioner
+    glBindTexture(GL_TEXTURE_2D, air_conditioner_tex_id);
+    glBegin(GL_TRIANGLES);
 }
 
 void init_gl()
@@ -54,15 +71,61 @@ void setup_lighting()
     glEnable(GL_LIGHT1);
 }
 
-int main(int argc, char **argv)
+void init_gl();
+void setup_lighting();
+int load_obj(const char* path, int object);
+int load_all_objects();
+unsigned int load_texture(const char* path);
+void load_all_textures();
+
+void display();
+void idle();
+void motion(int x, int y);
+void keyboard(unsigned char key, int x, int y);
+void keyboard_up(unsigned char key, int x, int y);
+void reshape(int width, int height);
+
+void draw_grid(int n);
+void main_door();
+void side_door();
+void windows();
+void move_fan();
+
+Vec3 forward(Transform* t);
+Vec3 right(Transform* t);
+Vec3 up(Transform* t);
+
+int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    glutInitWindowSize(1080, 900);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutCreateWindow("Cozinha reav");
-    glutDisplayFunc(display);
+    // Setting the window size, display mode, window name and placing the mouse pointer to the center of the screen
+    glutInitWindowSize(WINDOW_SIZE.x, WINDOW_SIZE.y);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutCreateWindow("Room");
+    glutWarpPointer(WINDOW_CENTER.x, WINDOW_CENTER.y);
 
+    // Setting the callback functions
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    glutPassiveMotionFunc(motion);
+    glutKeyboardFunc(keyboard);
+    glutKeyboardUpFunc(keyboard_up);
+    glutReshapeFunc(reshape);
+
+    // Initializing some options of OpenGL and lighting
+    init_gl();
+
+    // Setting initial camera position outside the room and facing the main door
+    CAM.position = (Vec3) {2.0f, 4.0f, -15.0f};
+    CAM.rotation = (Vec3) {0.0f, 90.0f, 0.0f};
+
+    // Loading the object files
+    load_all_objects();
+
+	load_all_textures();
+
+    // Initializing main loop
     glutMainLoop();
 
     return 0;
